@@ -1,0 +1,124 @@
+# .dockerignore para ChatCenter
+# Optimiza el build del contenedor excluyendo archivos innecesarios
+
+# Archivos de versión control
+.git
+.gitignore
+.gitattributes
+
+# Archivos de documentación (excepto los de chatcenter)
+docs/*.md
+docs/README*
+*.md
+README*
+CHANGELOG*
+LICENSE*
+
+# Permitir código fuente de chatcenter
+!chatcenter/
+!chatcenter/**/*
+
+# Archivos de entorno
+.env
+.env.*
+.env.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+*.bak
+*.swp
+*~
+
+# Archivos temporales
+*.tmp
+*.temp
+.tmp/
+
+# Cache de desarrollo
+.cache/
+.vscode/
+.idea/
+
+# Logs del sistema
+*.log
+logs/
+php_error_log*
+
+# Archivos de backup
+*.bak
+*.backup
+*_backup
+
+# Archivos de test y desarrollo
+test/
+tests/
+spec/
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos del desarrollador
+*.sublime-*
+.vscode/
+.idea/
+*.iml
+
+# Composer cache y archivos de vendor (se instalan automáticamente)
+vendor/
+composer.lock
+
+# Node modules (si los hay)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos de upload temporales
+uploads_temp/
+tmp/
+
+# Archivos de base de datos SQL (para desarrollo)
+*.sql
+sql/
+database/
+
+# Archivos de configuración del servidor de desarrollo
+xdebug.ini
+php.ini.development
+
+# Archivos del IDE
+*.sublime-project
+*.sublime-workspace
+
+# Archivos temporales del editor
+*~
+.#*
+#*#
+
+# Archivos de certificado SSL (si existen)
+*.crt
+*.key
+*.pem
+ssl/
+
+# Archivos de configuración personal
+config.local.php
+local.config.php
+
+# Cache del navegador (si existe)
+browser-cache/
+
+# Archivos de despliegue
+deploy/
+deployment/
+docker-compose*.yml
+Dockerfile*
+.dockerignore*
+
+# Archivos de desarrollo y entrada del usuario
+user_input_files/
+user_input_files.zip
+*.zip
