@@ -18,7 +18,7 @@ class Connection{
 		}
 		
 		// Parsear URL_DATABASE
-		// Formato: mariadb://user:pass@host:port/database
+		// Formato: mysql://user:pass@host:port/database (MySQL protocol para MariaDB)
 		$parsed = parse_url($urlDatabase);
 		
 		if (!$parsed || empty($parsed['host'])) {
