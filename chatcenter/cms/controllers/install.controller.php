@@ -8,10 +8,28 @@ class InstallController{
 
 	static public function infoDatabase(){
 
+		// Obtener URL_DATABASE desde variables de entorno
+		$urlDatabase = getenv('URL_DATABASE');
+		
+		if (empty($urlDatabase)) {
+			die("Error: La variable de entorno URL_DATABASE no está configurada");
+		}
+		
+		// Parsear URL_DATABASE
+		// Formato: mariadb://user:pass@host:port/database
+		$parsed = parse_url($urlDatabase);
+		
+		if (!$parsed || empty($parsed['host'])) {
+			die("Error: Formato de URL_DATABASE inválido");
+		}
+		
 		$infoDB = array(
-			"database" => "whatscloud-db",
-			"user" => "mariadb",
-			"pass" => "c6873d0542d664ca4ff1"
+			"database" => isset($parsed['path']) ? ltrim($parsed['path'], '/') : '',
+			"user" => $parsed['user'] ?? '',
+			"pass" => $parsed['pass'] ?? '',
+			"host" => $parsed['host'],
+			"port" => $parsed['port'] ?? '3306',
+			"dsn" => $urlDatabase
 		);
 
 		return $infoDB;
@@ -26,10 +44,8 @@ class InstallController{
 
 		try{
 
-			$link = new PDO("mysql:host=cloudmx_whatscloud-db:3306;dbname=".InstallController::infoDatabase()["database"],
-		                    InstallController::infoDatabase()["user"],
-		                    InstallController::infoDatabase()["pass"]
-		                );
+			$info = InstallController::infoDatabase();
+			$link = new PDO($info["dsn"]);
 			
 			$link->exec("set names utf8mb4");
 
