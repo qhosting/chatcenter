@@ -452,6 +452,7 @@ if($adminTable->status == 404){
 	<?php endif ?>
 
 	<script src="/views/assets/js/forms/forms.js"></script>
+	<script src="/views/assets/js/integrations/turnstile.js"></script>
 	
 	
 </body>

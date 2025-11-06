@@ -1,5 +1,11 @@
 <?php 
 
+require_once "models/connection.php";
+require_once "models/curl.model.php";
+require_once "models/get.model.php";
+require_once "models/post.model.php";
+require_once dirname(__DIR__) . "/api/models/turnstile.model.php";
+
 class InstallController{
 
 	/*=============================================
@@ -65,6 +71,25 @@ class InstallController{
 	public function install(){
 
 		if(isset($_POST["email_admin"])){
+
+			/*=============================================
+			Validar Cloudflare Turnstile
+			=============================================*/
+			
+			$turnstile_token = $_POST["g-recaptcha-response"] ?? "";
+			$turnstile_verification = TurnstileModel::verifyToken($turnstile_token);
+			
+			if (!$turnstile_verification['success'] && !$turnstile_verification['disabled']) {
+				echo '<div class="alert alert-danger mt-3 rounded">Error: Verificación de seguridad fallida</div>';
+				
+				echo '<script>
+					fncMatPreloader("off");
+					fncFormatInputs();
+					fncToastr("error", "Error: Verificación de seguridad fallida");
+				</script>';
+				
+				return;
+			}
 
 			echo '<script>
 					fncMatPreloader("on");

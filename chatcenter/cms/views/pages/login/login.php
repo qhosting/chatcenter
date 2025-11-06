@@ -18,6 +18,11 @@ if(isset($_GET["scode"])){
 
 }
 
+// Incluir modelo de Turnstile
+require_once "models/turnstile.model.php";
+$turnstile_config = TurnstileModel::getConfig();
+$show_turnstile = ($turnstile_config['enabled'] === 'true' && !empty($turnstile_config['site_key']));
+
 ?>
 
 
@@ -106,6 +111,15 @@ if(isset($_GET["scode"])){
 
 				?>
 
+				<?php if (!$securityCode && $show_turnstile): ?>
+				
+					<div class="form-group mb-3">
+						<?php echo TurnstileModel::renderTurnstile('login-form', array('theme' => 'light', 'language' => 'es')); ?>
+						<input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
+					</div>
+
+				<?php endif ?>
+
 				<?php else: ?>
 
 					<div class="form-group mb-3">
@@ -188,7 +202,12 @@ Modal para recuperar contraseña
 
           </div>
 
-
+          <?php if ($show_turnstile): ?>
+          <div class="form-group mb-3">
+          	<?php echo TurnstileModel::renderTurnstile('reset-form', array('theme' => 'light', 'language' => 'es')); ?>
+          	<input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-reset">
+          </div>
+          <?php endif ?>
 
       </div>
 

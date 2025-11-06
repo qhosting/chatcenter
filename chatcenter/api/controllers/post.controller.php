@@ -30,6 +30,30 @@ class PostController{
 
 	static public function postRegister($table, $data, $suffix){
 
+		/*=============================================
+		Incluir modelo de Turnstile para validación
+		=============================================*/
+		
+		require_once "models/turnstile.model.php";
+		
+		/*=============================================
+		Validar Cloudflare Turnstile si está habilitado
+		=============================================*/
+		
+		$turnstile_token = $data["g-recaptcha-response"] ?? "";
+		$turnstile_verification = TurnstileModel::verifyToken($turnstile_token);
+		
+		if (!$turnstile_verification['success'] && !$turnstile_verification['disabled']) {
+			
+			$json = array(
+				'status' => 400,
+				'results' => "Error: Security verification failed"
+			);
+
+			echo json_encode($json, http_response_code($json["status"]));
+			return;
+		}
+
 		if(isset($data["password_".$suffix]) && $data["password_".$suffix] != null){
 
 			$crypt = crypt($data["password_".$suffix], '$2a$07$azybxcags23425sdg23sdfhsd$');
@@ -101,6 +125,30 @@ class PostController{
 	=============================================*/
 
 	static public function postLogin($table, $data, $suffix){
+
+		/*=============================================
+		Incluir modelo de Turnstile para validación
+		=============================================*/
+		
+		require_once "models/turnstile.model.php";
+		
+		/*=============================================
+		Validar Cloudflare Turnstile si está habilitado
+		=============================================*/
+		
+		$turnstile_token = $data["g-recaptcha-response"] ?? "";
+		$turnstile_verification = TurnstileModel::verifyToken($turnstile_token);
+		
+		if (!$turnstile_verification['success'] && !$turnstile_verification['disabled']) {
+			
+			$json = array(
+				'status' => 400,
+				'results' => "Error: Security verification failed"
+			);
+
+			echo json_encode($json, http_response_code($json["status"]));
+			return;
+		}
 
 		/*=============================================
 		Validar que el usuario exista en BD

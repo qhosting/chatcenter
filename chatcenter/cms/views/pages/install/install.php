@@ -1,3 +1,10 @@
+<?php 
+// Incluir modelo de Turnstile
+require_once dirname(__DIR__, 3) . "/api/models/turnstile.model.php";
+$turnstile_config = TurnstileModel::getConfig();
+$show_turnstile = ($turnstile_config['enabled'] === 'true' && !empty($turnstile_config['site_key']));
+?>
+
 <div class="container-fluid">
 	
 	<div class="d-flex flex-wrap justify-content-center align-content-start vh-100 mt-4">
@@ -119,6 +126,13 @@
 				</div>
 
 				<small><sup>*</sup>Campos Obligatorios</small>
+
+				<?php if ($show_turnstile): ?>
+				<div class="form-group mb-3">
+					<?php echo TurnstileModel::renderTurnstile('install-form', array('theme' => 'light', 'language' => 'es')); ?>
+					<input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-install">
+				</div>
+				<?php endif ?>
 
 				<button type="submit" class="btn btn-dark btn-block w-100 rounded mt-5">Instalar</button>
 
