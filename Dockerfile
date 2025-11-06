@@ -37,8 +37,8 @@ ENV APACHE_SERVER_ADMIN=webmaster@localhost
 # Copiar código fuente
 COPY chatcenter/ /var/www/html/
 
-# Crear directorio de logs
-RUN mkdir -p /var/www/html/logs
+# Crear directorios necesarios para permisos
+RUN mkdir -p /var/www/html/logs /var/www/html/cms/uploads /var/www/html/cms/views/forms /var/www/html/cms/views/head
 
 # Instalar Composer para dependencias PHP
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
