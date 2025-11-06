@@ -9,9 +9,9 @@ class InstallController{
 	static public function infoDatabase(){
 
 		$infoDB = array(
-			"database" => "",
-			"user" => "",
-			"pass" => ""
+			"database" => "whatscloud-db",
+			"user" => "mariadb",
+			"pass" => "c6873d0542d664ca4ff1"
 		);
 
 		return $infoDB;
@@ -26,7 +26,7 @@ class InstallController{
 
 		try{
 
-			$link = new PDO("mysql:host=localhost;dbname=".InstallController::infoDatabase()["database"],
+			$link = new PDO("mysql:host=cloudmx_whatscloud-db:3306;dbname=".InstallController::infoDatabase()["database"],
 		                    InstallController::infoDatabase()["user"],
 		                    InstallController::infoDatabase()["pass"]
 		                );
