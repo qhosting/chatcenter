@@ -31,8 +31,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && a2enmod rewrite
 
 # Configurar variables de entorno de Apache
-ENV APACHE_DOCUMENT_ROOT /var/www/html/cms
-ENV APACHE_SERVER_ADMIN webmaster@localhost
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/cms
+ENV APACHE_SERVER_ADMIN=webmaster@localhost
 
 # Copiar código fuente
 COPY chatcenter/ /var/www/html/
