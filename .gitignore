@@ -887,44 +887,11 @@
 **/*.zip
 
 # ==============================================================================
-# PROJECT SPECIFIC - ChatCenter
+# PROJECT SPECIFIC
 # ==============================================================================
-
-# Archivos de desarrollo local específicos de ChatCenter
-docs/
-user_input_files/
-browser/
-tmp/
-imgs/
-extract/
-memories/
-workspace.json
-report_record.txt
-reporte_integral_chatcenter.md
-GUIA_INSTALACION_EASYPANEL.md
-
-# Archivos de configuración de EasyPanel
-easypanel.env
-
-# Archivos específicos del sistema de chat
-chatcenter/logs/
-chatcenter/cms/uploads_temp/
-
-# Archivos de base de datos de desarrollo
-database_dump.sql
-*.sql
-
-# Archivos de configuración local
-config.local.php
-local.config.php
-
-# Cache del sistema
-.phpunit.result.cache
-.hypothesis/
-
-# Archivos de certificados SSL
-ssl/
-*.pem
-*.key
-*.crt
+# Add your project-specific ignores here
+# workspace/
+# data/
+# uploads/
+# downloads/
 
