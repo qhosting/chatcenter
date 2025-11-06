@@ -1,0 +1,48 @@
+{
+  "todos": {
+    "Coordinator": {
+      "1": {
+        "id": "1",
+        "content": "Análisis de Arquitectura del Sistema",
+        "details": "1. Examinar la estructura general del proyecto ChatCenter. 2. Identificar tecnologías utilizadas (PHP, JavaScript, CSS, MySQL). 3. Mapear la arquitectura cliente-servidor. 4. Documentar la organización de módulos.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "2": {
+        "id": "2",
+        "content": "Análisis de la API REST (Backend PHP)",
+        "details": "1. Revisar controladores (GET, POST, PUT, DELETE). 2. Analizar modelos y conexiones a base de datos. 3. Examinar rutas y estructura de endpoints. 4. Revisar documentación API (PDF). 5. Identificar patrones de autenticación y seguridad.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "3": {
+        "id": "3",
+        "content": "Análisis del Frontend y CMS",
+        "details": "1. Examinar la estructura del CMS. 2. Analizar componentes de chat (HTML, CSS, JS). 3. Revisar funcionalidades de dashboard. 4. Evaluar diseño UI/UX y estilos CSS. 5. Identificar bibliotecas y frameworks utilizados.",
+        "status": "pending",
+        "priority": "high"
+      },
+      "4": {
+        "id": "4",
+        "content": "Análisis de Base de Datos",
+        "details": "1. Examinar el esquema de la base de datos (chatcenter.sql). 2. Identificar tablas principales y relaciones. 3. Analizar estructura de datos para usuarios, mensajes, conversaciones. 4. Documentar claves foráneas y restricciones.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "5": {
+        "id": "5",
+        "content": "Análisis de Testing y Documentación",
+        "details": "1. Revisar colección de Postman para endpoints. 2. Analizar documentación PDF de la API. 3. Identificar casos de prueba y flujos de trabajo. 4. Evaluar completitud de la documentación técnica.",
+        "status": "pending",
+        "priority": "medium"
+      },
+      "6": {
+        "id": "6",
+        "content": "Reporte de Análisis Integral",
+        "details": "1. Compilar todos los hallazgos en un reporte estructurado. 2. Identificar fortalezas y áreas de mejora. 3. Proporcionar recomendaciones técnicas. 4. Incluir diagramas de arquitectura si es necesario. 5. Crear resumen ejecutivo del sistema.",
+        "status": "pending",
+        "priority": "high"
+      }
+    }
+  }
+}
