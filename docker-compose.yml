@@ -14,10 +14,10 @@ services:
       # ===========================================
       # Database Configuration
       # ===========================================
-      - DB_HOST=cloudmx_whatscloud-db
-      - DB_DATABASE=whatscloud-db
-      - DB_USER=mariadb
-      - DB_PASSWORD=c6873d0542d664ca4ff1
+      - DB_HOST=${DB_HOST}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=3306
       
       # ===========================================
@@ -99,10 +99,10 @@ services:
     container_name: chatcenter-mysql
     restart: unless-stopped
     environment:
-      - MARIADB_ROOT_PASSWORD=d3c2226ae36deabb3eae
-      - MARIADB_DATABASE=whatscloud-db
-      - MARIADB_USER=mariadb
-      - MARIADB_PASSWORD=c6873d0542d664ca4ff1
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
