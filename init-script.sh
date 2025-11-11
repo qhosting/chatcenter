@@ -15,10 +15,10 @@ generate_api_key() {
 # 1. Set up and validate environment variables
 setup_variables() {
     echo "1. ⚙️  Validating environment variables..."
-    : "${DB_HOST:?Error: DB_HOST is not set.}"
-    : "${DB_DATABASE:?Error: DB_DATABASE is not set.}"
-    : "${DB_USER:?Error: DB_USER is not set.}"
-    : "${DB_PASSWORD:?Error: DB_PASSWORD is not set.}"
+    : "${DB_HOST:?Error: DB_HOST is not set}"
+    : "${DB_DATABASE:?Error: DB_DATABASE is not set}"
+    : "${DB_USER:?Error: DB_USER is not set}"
+    : "${DB_PASSWORD:?Error: DB_PASSWORD is not set}"
     : "${DB_PORT:=3306}"
 
     : "${APP_DOMAIN:=localhost}"
