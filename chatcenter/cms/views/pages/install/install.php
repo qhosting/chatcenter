@@ -1,155 +1,155 @@
 <?php 
 // Incluir modelo de Turnstile
-require_once dirname(__DIR__, 3) . "/api/models/turnstile.model.php";
+require_once dirname(__DIR__, 4) . "/api/models/turnstile.model.php";
 $turnstile_config = TurnstileModel::getConfig();
 $show_turnstile = ($turnstile_config['enabled'] === 'true' && !empty($turnstile_config['site_key']));
 ?>
 
 <div class="container-fluid">
-	
-	<div class="d-flex flex-wrap justify-content-center align-content-start vh-100 mt-4">
-		
-		<div class="card border-0 rounded shadow p-5">
-			
-			<form method="POST" class="needs-validation" novalidate>
-				
-				<h3 class="pt-3 text-center">Instalación Dashboard</h3>
+        
+        <div class="d-flex flex-wrap justify-content-center align-content-start vh-100 mt-4">
+                
+                <div class="card border-0 rounded shadow p-5">
+                        
+                        <form method="POST" class="needs-validation" novalidate>
+                                
+                                <h3 class="pt-3 text-center">Instalación Dashboard</h3>
 
-				<hr>
+                                <hr>
 
-				<div class="form-group mb-3">
-					
-					<label for="email_admin">Correo Administrador <sup>*</sup></label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="email_admin">Correo Administrador <sup>*</sup></label>
 
-					<input 
-					type="email"
-					class="form-control rounded"
-					id="email_admin"
-					name="email_admin"
-					required
-					>
+                                        <input 
+                                        type="email"
+                                        class="form-control rounded"
+                                        id="email_admin"
+                                        name="email_admin"
+                                        required
+                                        >
 
-					<div class="valid-feedback">Válido.</div>
-    				<div class="invalid-feedback">Campo inválido.</div>
+                                        <div class="valid-feedback">Válido.</div>
+                                <div class="invalid-feedback">Campo inválido.</div>
 
-				</div>
+                                </div>
 
-				<div class="form-group mb-3">
-					
-					<label for="password_admin">Contraseña Administrador <sup>*</sup></label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="password_admin">Contraseña Administrador <sup>*</sup></label>
 
-					<input 
-					type="password"
-					class="form-control rounded"
-					id="password_admin"
-					name="password_admin"
-					required
-					>
+                                        <input 
+                                        type="password"
+                                        class="form-control rounded"
+                                        id="password_admin"
+                                        name="password_admin"
+                                        required
+                                        >
 
-					<div class="valid-feedback">Válido.</div>
-    				<div class="invalid-feedback">Campo inválido.</div>
+                                        <div class="valid-feedback">Válido.</div>
+                                <div class="invalid-feedback">Campo inválido.</div>
 
-				</div>
+                                </div>
 
-				<div class="form-group mb-3">
-					
-					<label for="title_admin">Nombre del Dashboard <sup>*</sup></label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="title_admin">Nombre del Dashboard <sup>*</sup></label>
 
-					<input 
-					type="text"
-					class="form-control rounded"
-					id="title_admin"
-					name="title_admin"
-					required
-					>
+                                        <input 
+                                        type="text"
+                                        class="form-control rounded"
+                                        id="title_admin"
+                                        name="title_admin"
+                                        required
+                                        >
 
-					<div class="valid-feedback">Válido.</div>
-    				<div class="invalid-feedback">Campo inválido.</div>
+                                        <div class="valid-feedback">Válido.</div>
+                                <div class="invalid-feedback">Campo inválido.</div>
 
-				</div>
+                                </div>
 
-				<div class="form-group mb-3">
-					
-					<label for="symbol_admin">Símbolo del Dashboard <sup>*</sup></label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="symbol_admin">Símbolo del Dashboard <sup>*</sup></label>
 
-					<input 
-					type="text"
-					class="form-control rounded"
-					id="symbol_admin"
-					name="symbol_admin"
-					required
-					>
+                                        <input 
+                                        type="text"
+                                        class="form-control rounded"
+                                        id="symbol_admin"
+                                        name="symbol_admin"
+                                        required
+                                        >
 
-					<div class="valid-feedback">Válido.</div>
-    				<div class="invalid-feedback">Campo inválido.</div>
+                                        <div class="valid-feedback">Válido.</div>
+                                <div class="invalid-feedback">Campo inválido.</div>
 
-				</div>
+                                </div>
 
-				<div class="form-group mb-3">
-					
-					<label for="font_admin">Tipografía del Dashboard</label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="font_admin">Tipografía del Dashboard</label>
 
-					<textarea 
-					class="form-control rounded"
-					id="font_admin"
-					name="font_admin"
-					></textarea>
+                                        <textarea 
+                                        class="form-control rounded"
+                                        id="font_admin"
+                                        name="font_admin"
+                                        ></textarea>
 
-				</div>
+                                </div>
 
-				<div class="form-group mb-3">
-					
-					<label for="color_admin">Color del Dashboard</label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="color_admin">Color del Dashboard</label>
 
-					<input 
-					type="color"
-					class="form-control form-control-color rounded"
-					id="color_admin"
-					name="color_admin"
-					value="#000000"
-					title="Escoge Color"
-					>
+                                        <input 
+                                        type="color"
+                                        class="form-control form-control-color rounded"
+                                        id="color_admin"
+                                        name="color_admin"
+                                        value="#000000"
+                                        title="Escoge Color"
+                                        >
 
-				</div>
+                                </div>
 
-				<div class="form-group mb-3">
-					
-					<label for="back_admin">Imagen para el Login</label>
+                                <div class="form-group mb-3">
+                                        
+                                        <label for="back_admin">Imagen para el Login</label>
 
-					<input 
-					type="text"
-					class="form-control rounded"
-					id="back_admin"
-					name="back_admin"
-					>
+                                        <input 
+                                        type="text"
+                                        class="form-control rounded"
+                                        id="back_admin"
+                                        name="back_admin"
+                                        >
 
-				</div>
+                                </div>
 
-				<small><sup>*</sup>Campos Obligatorios</small>
+                                <small><sup>*</sup>Campos Obligatorios</small>
 
-				<?php if ($show_turnstile): ?>
-				<div class="form-group mb-3">
-					<?php echo TurnstileModel::renderTurnstile('install-form', array('theme' => 'light', 'language' => 'es')); ?>
-					<input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-install">
-				</div>
-				<?php endif ?>
+                                <?php if ($show_turnstile): ?>
+                                <div class="form-group mb-3">
+                                        <?php echo TurnstileModel::renderTurnstile('install-form', array('theme' => 'light', 'language' => 'es')); ?>
+                                        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response-install">
+                                </div>
+                                <?php endif ?>
 
-				<button type="submit" class="btn btn-dark btn-block w-100 rounded mt-5">Instalar</button>
+                                <button type="submit" class="btn btn-dark btn-block w-100 rounded mt-5">Instalar</button>
 
 
-				<?php 
-				
-				require_once "controllers/install.controller.php";
-				$install = new InstallController();
-				$install -> install();
+                                <?php 
+                                
+                                require_once "controllers/install.controller.php";
+                                $install = new InstallController();
+                                $install -> install();
 
-				?>
+                                ?>
 
-			</form>
+                        </form>
 
-		</div>
+                </div>
 
-	</div>
+        </div>
 
 
 </div>

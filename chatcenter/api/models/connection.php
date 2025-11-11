@@ -1,209 +1,209 @@
 <?php
 
-require_once "get.model.php";
+// require_once "get.model.php"; // Comentado temporalmente - archivo no existe
 
 class Connection{
 
-	/*=============================================
-	Información de la base de datos
-	=============================================*/
+        /*=============================================
+        Información de la base de datos
+        =============================================*/
 
-	static public function infoDatabase(){
+        static public function infoDatabase(){
 
-		// Obtener URL_DATABASE desde variables de entorno
-		$urlDatabase = getenv('URL_DATABASE');
-		
-		if (empty($urlDatabase)) {
-			die("Error: La variable de entorno URL_DATABASE no está configurada");
-		}
-		
-		// Parsear URL_DATABASE
-		// Formato: mysql://user:pass@host:port/database (MySQL protocol para MariaDB)
-		$parsed = parse_url($urlDatabase);
-		
-		if (!$parsed || empty($parsed['host'])) {
-			die("Error: Formato de URL_DATABASE inválido");
-		}
-		
-		$infoDB = array(
-			"database" => isset($parsed['path']) ? ltrim($parsed['path'], '/') : '',
-			"user" => $parsed['user'] ?? '',
-			"pass" => $parsed['pass'] ?? '',
-			"host" => $parsed['host'],
-			"port" => $parsed['port'] ?? '3306',
-			"dsn" => $urlDatabase
-		);
+                // Obtener URL_DATABASE desde variables de entorno
+                $urlDatabase = getenv('URL_DATABASE');
+                
+                if (empty($urlDatabase)) {
+                        die("Error: La variable de entorno URL_DATABASE no está configurada");
+                }
+                
+                // Parsear URL_DATABASE
+                // Formato: mysql://user:pass@host:port/database (MySQL protocol para MariaDB)
+                $parsed = parse_url($urlDatabase);
+                
+                if (!$parsed || empty($parsed['host'])) {
+                        die("Error: Formato de URL_DATABASE inválido");
+                }
+                
+                $infoDB = array(
+                        "database" => isset($parsed['path']) ? ltrim($parsed['path'], '/') : '',
+                        "user" => $parsed['user'] ?? '',
+                        "pass" => $parsed['pass'] ?? '',
+                        "host" => $parsed['host'],
+                        "port" => $parsed['port'] ?? '3306',
+                        "dsn" => $urlDatabase
+                );
 
-		return $infoDB;
+                return $infoDB;
 
-	}
+        }
 
-	/*=============================================
-	APIKEY
-	=============================================*/
+        /*=============================================
+        APIKEY
+        =============================================*/
 
-	static public function apikey(){
+        static public function apikey(){
 
-		return "sdfgsdgdsfgh4356e45rdfhdfgh5rdfhfgjrtrer";
+                return "sdfgsdgdsfgh4356e45rdfhdfgh5rdfhfgjrtrer";
 
-	}
+        }
 
-	/*=============================================
-	Acceso público
-	=============================================*/
-	
-	static public function publicAccess(){
+        /*=============================================
+        Acceso público
+        =============================================*/
+        
+        static public function publicAccess(){
 
-		$tables = [""];
+                $tables = [""];
 
-		return $tables;
+                return $tables;
 
-	}
+        }
 
-	/*=============================================
-	Conexión a la base de datos
-	=============================================*/
+        /*=============================================
+        Conexión a la base de datos
+        =============================================*/
 
-	static public function connect(){
+        static public function connect(){
 
 
-		try{
+                try{
 
-			$info = Connection::infoDatabase();
-			$link = new PDO($info["dsn"]);
+                        $info = Connection::infoDatabase();
+                        $link = new PDO($info["dsn"]);
 
-			$link->exec("set names utf8mb4");
+                        $link->exec("set names utf8mb4");
 
-		}catch(PDOException $e){
+                }catch(PDOException $e){
 
-			die("Error: ".$e->getMessage());
+                        die("Error: ".$e->getMessage());
 
-		}
+                }
 
-		return $link;
+                return $link;
 
-	}
+        }
 
-	/*=============================================
-	Validar existencia de una tabla en la bd
-	=============================================*/
+        /*=============================================
+        Validar existencia de una tabla en la bd
+        =============================================*/
 
-	static public function getColumnsData($table, $columns){
+        static public function getColumnsData($table, $columns){
 
-		/*=============================================
-		Traer el nombre de la base de datos
-		=============================================*/
+                /*=============================================
+                Traer el nombre de la base de datos
+                =============================================*/
 
-		$database = Connection::infoDatabase()["database"];
+                $database = Connection::infoDatabase()["database"];
 
-		/*=============================================
-		Traer todas las columnas de una tabla
-		=============================================*/
+                /*=============================================
+                Traer todas las columnas de una tabla
+                =============================================*/
 
-		$validate = Connection::connect()
-		->query("SELECT COLUMN_NAME AS item FROM information_schema.columns WHERE table_schema = '$database' AND table_name = '$table'")
-		->fetchAll(PDO::FETCH_OBJ);
+                $validate = Connection::connect()
+                ->query("SELECT COLUMN_NAME AS item FROM information_schema.columns WHERE table_schema = '$database' AND table_name = '$table'")
+                ->fetchAll(PDO::FETCH_OBJ);
 
-		/*=============================================
-		Validamos existencia de la tabla
-		=============================================*/
+                /*=============================================
+                Validamos existencia de la tabla
+                =============================================*/
 
-		if(empty($validate)){
+                if(empty($validate)){
 
-			return null;
+                        return null;
 
-		}else{
+                }else{
 
-			/*=============================================
-			Ajuste de selección de columnas globales
-			=============================================*/
+                        /*=============================================
+                        Ajuste de selección de columnas globales
+                        =============================================*/
 
-			if($columns[0] == "*"){
-				
-				array_shift($columns);
+                        if($columns[0] == "*"){
+                                
+                                array_shift($columns);
 
-			}
+                        }
 
-			/*=============================================
-			Validamos existencia de columnas
-			=============================================*/
+                        /*=============================================
+                        Validamos existencia de columnas
+                        =============================================*/
 
-			$sum = 0;
-				
-			foreach ($validate as $key => $value) {
+                        $sum = 0;
+                                
+                        foreach ($validate as $key => $value) {
 
-				$sum += in_array($value->item, $columns);	
-				
-						
-			}
+                                $sum += in_array($value->item, $columns);       
+                                
+                                                
+                        }
 
 
 
-			return $sum == count($columns) ? $validate : null;
-			
-			
-			
-		}
+                        return $sum == count($columns) ? $validate : null;
+                        
+                        
+                        
+                }
 
-	}
+        }
 
-	/*=============================================
-	Generar Token de Autenticación
-	=============================================*/
+        /*=============================================
+        Generar Token de Autenticación
+        =============================================*/
 
-	static public function jwt($id, $email){
+        static public function jwt($id, $email){
 
-		$time = time();
+                $time = time();
 
-		$token = array(
+                $token = array(
 
-			"iat" =>  $time,//Tiempo en que inicia el token
-			"exp" => $time + (60*60*24), // Tiempo en que expirará el token (1 día)
-			"data" => [
+                        "iat" =>  $time,//Tiempo en que inicia el token
+                        "exp" => $time + (60*60*24), // Tiempo en que expirará el token (1 día)
+                        "data" => [
 
-				"id" => $id,
-				"email" => $email
-			]
+                                "id" => $id,
+                                "email" => $email
+                        ]
 
-		);
+                );
 
-		return $token;
-	}
+                return $token;
+        }
 
-	/*=============================================
-	Validar el token de seguridad
-	=============================================*/
+        /*=============================================
+        Validar el token de seguridad
+        =============================================*/
 
-	static public function tokenValidate($token,$table,$suffix){
+        static public function tokenValidate($token,$table,$suffix){
 
-		/*=============================================
-		Traemos el usuario de acuerdo al token
-		=============================================*/
-		$user = GetModel::getDataFilter($table, "token_exp_".$suffix, "token_".$suffix, $token, null,null,null,null);
-		
-		if(!empty($user)){
+                /*=============================================
+                Traemos el usuario de acuerdo al token
+                =============================================*/
+                $user = GetModel::getDataFilter($table, "token_exp_".$suffix, "token_".$suffix, $token, null,null,null,null);
+                
+                if(!empty($user)){
 
-			/*=============================================
-			Validamos que el token no haya expirado
-			=============================================*/	
+                        /*=============================================
+                        Validamos que el token no haya expirado
+                        =============================================*/ 
 
-			$time = time();
+                        $time = time();
 
-			if($time < $user[0]->{"token_exp_".$suffix}){
+                        if($time < $user[0]->{"token_exp_".$suffix}){
 
-				return "ok";
+                                return "ok";
 
-			}else{
+                        }else{
 
-				return "expired";
-			}
+                                return "expired";
+                        }
 
-		}else{
+                }else{
 
-			return "no-auth";
+                        return "no-auth";
 
-		}
+                }
 
-	}
+        }
 
 }
