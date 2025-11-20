@@ -50,12 +50,14 @@ RUN cd /var/www/html/cms/extensions && composer install --no-dev --optimize-auto
 # Configurar permisos
 RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 755 /var/www/html
-RUN chmod -R 777 /var/www/html/cms/uploads
-RUN chmod -R 777 /var/www/html/cms/views/modules
-RUN chmod -R 777 /var/www/html/cms/views/pages
-RUN chmod -R 777 /var/www/html/cms/views/forms
-RUN chmod -R 777 /var/www/html/cms/views/head
-RUN chmod -R 777 /var/www/html/logs
+RUN find /var/www/html -type d -exec chmod 755 {} \;
+RUN find /var/www/html -type f -exec chmod 644 {} \;
+RUN chmod -R 775 /var/www/html/cms/uploads
+RUN chmod -R 775 /var/www/html/cms/views/modules
+RUN chmod -R 775 /var/www/html/cms/views/pages
+RUN chmod -R 775 /var/www/html/cms/views/forms
+RUN chmod -R 775 /var/www/html/cms/views/head
+RUN chmod -R 775 /var/www/html/logs
 
 # Copiar configuración de Apache personalizada
 COPY apache.conf /etc/apache2/sites-available/000-default.conf

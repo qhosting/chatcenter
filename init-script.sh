@@ -1,184 +1,65 @@
 #!/bin/bash
-
-# Script de inicialización automática para ChatCenter
-# Lee variables de entorno y ejecuta instalación automática
-
 set -e
 
-echo "🚀 ChatCenter Docker - Iniciando configuración automática..."
-
-# Función para generar contraseña segura si no se proporciona
+# --- Helper Functions ---
 generate_secure_password() {
-    openssl rand -base64 32
+    openssl rand -base64 16
 }
 
-# Función para generar API Key segura
 generate_api_key() {
     openssl rand -hex 32
 }
 
-# Variables con valores por defecto
-: "${DB_HOST:=cloudmx_whatscloud-db}"
-: "${DB_DATABASE:=whatscloud-db}"
-: "${DB_USER:=mariadb}"
-: "${DB_PASSWORD:=c6873d0542d664ca4ff1}"
-: "${DB_PORT:=3306}"
+# --- Main Functions ---
 
-: "${APP_DOMAIN:=localhost}"
-: "${APP_URL:=http://localhost}"
-: "${APP_ENV:=production}"
-: "${API_KEY:=$(generate_api_key)}"
+# 1. Set up and validate environment variables
+setup_variables() {
+    echo "1. ⚙️  Validating environment variables..."
+    : "${DB_HOST:?Error: DB_HOST is not set}"
+    : "${DB_DATABASE:?Error: DB_DATABASE is not set}"
+    : "${DB_USER:?Error: DB_USER is not set}"
+    : "${DB_PASSWORD:?Error: DB_PASSWORD is not set}"
+    : "${DB_PORT:=3306}"
 
-# Configuración del administrador (desde variables de entorno)
-: "${ADMIN_EMAIL:=admin@${APP_DOMAIN}}"
-: "${ADMIN_PASSWORD:=$(generate_secure_password)}"
-: "${ADMIN_TITLE:=ChatCenter}"
-: "${ADMIN_SYMBOL:=💬}"
-: "${ADMIN_FONT:=}"
-: "${ADMIN_COLOR:=#075e54}"
-: "${ADMIN_BACKGROUND:=}"
+    : "${APP_DOMAIN:=localhost}"
+    : "${APP_URL:=http://localhost}"
+    : "${APP_ENV:=production}"
+    : "${API_KEY:=$(generate_api_key)}"
 
-echo "📋 Configuración detectada:"
-echo "   Database: ${DB_HOST}:${DB_PORT}/${DB_DATABASE}"
-echo "   API Key: ${API_KEY:0:16}..."
-echo "   Admin Email: ${ADMIN_EMAIL}"
-echo "   Admin Title: ${ADMIN_TITLE}"
-echo "   Environment: ${APP_ENV}"
+    : "${ADMIN_EMAIL:=admin@${APP_DOMAIN}}"
+    : "${ADMIN_PASSWORD:=$(generate_secure_password)}"
+    : "${ADMIN_TITLE:=ChatCenter}"
+    : "${ADMIN_SYMBOL:=💬}"
+    : "${ADMIN_FONT:=}"
+    : "${ADMIN_COLOR:=#075e54}"
+    : "${ADMIN_BACKGROUND:=}"
 
-# Crear archivo de configuración temporal
-cat > /tmp/env_config.php << EOL
-<?php
-// Configuración temporal para la instalación
-define('TEMP_DB_HOST', '${DB_HOST}');
-define('TEMP_DB_NAME', '${DB_DATABASE}');
-define('TEMP_DB_USER', '${DB_USER}');
-define('TEMP_DB_PASS', '${DB_PASSWORD}');
-define('TEMP_DB_PORT', '${DB_PORT}');
-define('TEMP_API_KEY', '${API_KEY}');
-define('TEMP_ADMIN_EMAIL', '${ADMIN_EMAIL}');
-define('TEMP_ADMIN_PASSWORD', '${ADMIN_PASSWORD}');
-define('TEMP_ADMIN_TITLE', '${ADMIN_TITLE}');
-define('TEMP_ADMIN_SYMBOL', '${ADMIN_SYMBOL}');
-define('TEMP_ADMIN_FONT', '${ADMIN_FONT}');
-define('TEMP_ADMIN_COLOR', '${ADMIN_COLOR}');
-define('TEMP_ADMIN_BACKGROUND', '${ADMIN_BACKGROUND}');
-?>
-EOL
+    echo "   ✅ Variables are set."
+}
 
-echo "🔧 Aplicando configuración de base de datos..."
-
-# Actualizar connection.php con variables de entorno
-sed -i "s/database.*=.*\"[^\"]*\"/database => \"${DB_DATABASE}\"/g" /var/www/html/api/models/connection.php
-sed -i "s/user.*=.*\"[^\"]*\"/user => \"${DB_USER}\"/g" /var/www/html/api/models/connection.php  
-sed -i "s/pass.*=.*\"[^\"]*\"/pass => \"${DB_PASSWORD}\"/g" /var/www/html/api/models/connection.php
-
-# Actualizar API Key
-sed -i "s/return \"[^\"]*\"/return \"${API_KEY}\"/g" /var/www/html/api/models/connection.php
-
-echo "🔗 Configurando conexión a base de datos..."
-
-# Probar conexión a la base de datos
-MAX_RETRIES=30
-RETRY_COUNT=0
-
-while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -e "USE ${DB_DATABASE};" 2>/dev/null; then
-        echo "✅ Conexión a base de datos establecida"
-        break
-    else
-        echo "⏳ Esperando base de datos... (intento $((RETRY_COUNT + 1))/$MAX_RETRIES)"
-        sleep 5
+# 2. Wait for the database to be ready
+wait_for_db() {
+    echo "2. ⏳ Waiting for database connection..."
+    MAX_RETRIES=30
+    RETRY_COUNT=0
+    while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+        if mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -e "USE ${DB_DATABASE};" &>/dev/null; then
+            echo "   ✅ Database connection successful."
+            return 0
+        fi
         RETRY_COUNT=$((RETRY_COUNT + 1))
-    fi
-done
-
-if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-    echo "❌ No se pudo conectar a la base de datos después de $MAX_RETRIES intentos"
-    echo "   Verificar configuración:"
-    echo "   - Host: ${DB_HOST}"
-    echo "   - Database: ${DB_DATABASE}"
-    echo "   - User: ${DB_USER}"
-    echo "   - Port: ${DB_PORT}"
+        echo "   ... retrying in 5 seconds (${RETRY_COUNT}/${MAX_RETRIES})"
+        sleep 5
+    done
+    echo "   ❌ Error: Could not connect to the database after $MAX_RETRIES attempts."
     exit 1
-fi
+}
 
-echo "🗄️ Verificando esquema de base de datos..."
-
-# Verificar si ya existe el esquema completo
-TABLES_CHECK=$(mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -D"${DB_DATABASE}" -e "SHOW TABLES;" 2>/dev/null | wc -l)
-
-if [ $TABLES_CHECK -gt 5 ]; then
-    echo "✅ Esquema de base de datos detectado"
-    
-    # Verificar si ya está instalado el sistema
-    ADMIN_COUNT=$(mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -D"${DB_DATABASE}" -e "SELECT COUNT(*) FROM admins;" 2>/dev/null | tail -1)
-    
-    if [ "$ADMIN_COUNT" -gt 0 ]; then
-        echo "✅ Sistema ChatCenter ya instalado"
-        echo "🎉 Acceso disponible en: ${APP_URL}"
-        echo "👤 Admin: ${ADMIN_EMAIL}"
-        echo "🔑 Password: ${ADMIN_PASSWORD}"
-        
-        # Guardar credenciales en archivo
-        echo "ChatCenter - Credenciales de acceso" > /var/www/html/install-credentials.txt
-        echo "URL: ${APP_URL}" >> /var/www/html/install-credentials.txt
-        echo "Email: ${ADMIN_EMAIL}" >> /var/www/html/install-credentials.txt
-        echo "Password: ${ADMIN_PASSWORD}" >> /var/www/html/install-credentials.txt
-        echo "API Key: ${API_KEY}" >> /var/www/html/install-credentials.txt
-        echo "Fecha: $(date)" >> /var/www/html/install-credentials.txt
-        
-    else
-        echo "⚠️ Esquema existe pero sistema no está instalado"
-        echo "📦 Ejecutando instalación automática..."
-        
-        # Ejecutar instalación
-        cd /var/www/html/cms
-        php -r "
-        \$_POST['email_admin'] = '${ADMIN_EMAIL}';
-        \$_POST['password_admin'] = '${ADMIN_PASSWORD}';
-        \$_POST['title_admin'] = '${ADMIN_TITLE}';
-        \$_POST['symbol_admin'] = '${ADMIN_SYMBOL}';
-        \$_POST['font_admin'] = '${ADMIN_FONT}';
-        \$_POST['color_admin'] = '${ADMIN_COLOR}';
-        \$_POST['back_admin'] = '${ADMIN_BACKGROUND}';
-        include 'controllers/install.controller.php';
-        \$install = new InstallController();
-        \$install->install();
-        "
-        
-        echo "✅ Instalación automática completada"
-    fi
-else
-    echo "📦 Ejecutando instalación completa del sistema..."
-    
-    # Importar esquema SQL si está disponible
-    if [ -f "/var/www/html/chatcenter.sql" ]; then
-        echo "📄 Importando esquema SQL..."
-        mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -D"${DB_DATABASE}" < /var/www/html/chatcenter.sql
-    fi
-    
-    # Ejecutar instalación
-    cd /var/www/html/cms
-    php -r "
-    \$_POST['email_admin'] = '${ADMIN_EMAIL}';
-    \$_POST['password_admin'] = '${ADMIN_PASSWORD}';
-    \$_POST['title_admin'] = '${ADMIN_TITLE}';
-    \$_POST['symbol_admin'] = '${ADMIN_SYMBOL}';
-    \$_POST['font_admin'] = '${ADMIN_FONT}';
-    \$_POST['color_admin'] = '${ADMIN_COLOR}';
-    \$_POST['back_admin'] = '${ADMIN_BACKGROUND}';
-    include 'controllers/install.controller.php';
-    \$install = new InstallController();
-    \$install->install();
-    "
-    
-    echo "✅ Instalación automática completada"
-fi
-
-echo "🔐 Configurando variables de entorno PHP..."
-
-# Crear archivo .env para la aplicación
-cat > /var/www/html/.env << EOL
+# 3. Create the .env file for the application
+configure_environment() {
+    echo "3. 📄 Creating .env file..."
+    # Create .env file for the PHP application
+    cat > /var/www/html/.env << EOL
 # ChatCenter Environment Configuration
 DB_HOST=${DB_HOST}
 DB_DATABASE=${DB_DATABASE}
@@ -208,29 +89,98 @@ ADMIN_TITLE=${ADMIN_TITLE}
 ADMIN_SYMBOL=${ADMIN_SYMBOL}
 ADMIN_COLOR=${ADMIN_COLOR}
 EOL
+    echo "   ✅ .env file created."
+}
 
-echo "🛡️ Configurando seguridad..."
+# 4. Run the ChatCenter installer if needed
+run_installation() {
+    echo "4. 🚀 Checking if installation is required..."
+    ADMIN_COUNT=$(mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -D"${DB_DATABASE}" -ss -e "SELECT COUNT(*) FROM admins;" 2>/dev/null || echo 0)
 
-# Deshabilitar installer después de la instalación
-rm -f /var/www/html/cms/views/pages/install/install.php
-touch /var/www/html/cms/views/pages/install/install.php
-echo "<?php echo 'Sistema ya instalado. Contacte al administrador.'; ?>" > /var/www/html/cms/views/pages/install/install.php
+    if [ "$ADMIN_COUNT" -gt 0 ]; then
+        echo "   ✅ ChatCenter is already installed."
+        return
+    fi
 
-# Configurar permisos finales
-chown -R www-data:www-data /var/www/html
-chmod -R 755 /var/www/html
-chmod -R 777 /var/www/html/cms/uploads
-chmod -R 777 /var/www/html/logs
+    echo "   📦 New installation detected. Running installer..."
 
-echo "📋 Resumen de instalación:"
-echo "   URL: ${APP_URL}"
-echo "   Admin: ${ADMIN_EMAIL}"
-echo "   Password: ${ADMIN_PASSWORD}"
-echo "   API Key: ${API_KEY:0:16}..."
-echo "   Database: ${DB_DATABASE} @ ${DB_HOST}:${DB_PORT}"
+    # Import database schema if tables don't exist
+    TABLE_COUNT=$(mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -D"${DB_DATABASE}" -ss -e "SHOW TABLES;" 2>/dev/null | wc -l)
+    if [ "$TABLE_COUNT" -eq 0 ] && [ -f "/var/www/html/chatcenter.sql" ]; then
+        echo "   ... Importing database schema from chatcenter.sql"
+        mysql -h"${DB_HOST}" -P"${DB_PORT}" -u"${DB_USER}" -p"${DB_PASSWORD}" -D"${DB_DATABASE}" < /var/www/html/chatcenter.sql
+    fi
 
-echo "✅ ChatCenter listo para usar!"
-echo "🚀 Iniciando servidor web..."
+    # Execute PHP installer
+    echo "   ... Running PHP install script."
+    cd /var/www/html/cms
+    php -r "
+    \$_POST['email_admin'] = getenv('ADMIN_EMAIL');
+    \$_POST['password_admin'] = getenv('ADMIN_PASSWORD');
+    \$_POST['title_admin'] = getenv('ADMIN_TITLE');
+    \$_POST['symbol_admin'] = getenv('ADMIN_SYMBOL');
+    \$_POST['font_admin'] = getenv('ADMIN_FONT');
+    \$_POST['color_admin'] = getenv('ADMIN_COLOR');
+    \$_POST['back_admin'] = getenv('ADMIN_BACKGROUND');
+    include 'controllers/install.controller.php';
+    \$install = new InstallController();
+    \$install->install();
+    "
+    echo "   ✅ Installation complete."
+}
 
-# Ejecutar comando original
-exec "$@"
+# 5. Secure the installation
+secure_installation() {
+    echo "5. 🛡️  Securing installation..."
+    # Disable installer page for security
+    INSTALLER_PATH="/var/www/html/cms/views/pages/install/install.php"
+    if [ -f "$INSTALLER_PATH" ]; then
+        rm -f "$INSTALLER_PATH"
+        echo "<?php http_response_code(404); echo 'Installer is disabled.'; ?>" > "$INSTALLER_PATH"
+        echo "   ... Installer page disabled."
+    fi
+
+    # Set final, secure permissions
+    echo "   ... Setting final file permissions."
+    chown -R www-data:www-data /var/www/html
+    chmod -R 775 /var/www/html/cms/uploads /var/www/html/logs
+    echo "   ✅ Security measures applied."
+}
+
+# 6. Save credentials and show summary
+show_summary() {
+    echo "---"
+    echo "🎉 ChatCenter Installation Summary 🎉"
+    echo "   URL: ${APP_URL}"
+    echo "   Admin Email: ${ADMIN_EMAIL}"
+    echo "   Admin Password: ${ADMIN_PASSWORD}"
+    echo "   API Key: ${API_KEY:0:16}..."
+    echo "---"
+
+    # Save credentials to a file for easy access
+    CREDENTIALS_FILE="/var/www/html/install-credentials.txt"
+    echo "Credentials saved to ${CREDENTIALS_FILE} (inside the container)"
+    cat > "$CREDENTIALS_FILE" << EOL
+# ChatCenter Access Credentials (Generated on $(date))
+URL=${APP_URL}
+Email=${ADMIN_EMAIL}
+Password=${ADMIN_PASSWORD}
+API_Key=${API_KEY}
+EOL
+}
+
+# --- Execution ---
+main() {
+    echo "🚀 ChatCenter Docker - Starting automatic setup..."
+    setup_variables
+    wait_for_db
+    configure_environment
+    run_installation
+    secure_installation
+    show_summary
+
+    echo "✅ Setup complete. Starting web server..."
+    exec "$@"
+}
+
+main
